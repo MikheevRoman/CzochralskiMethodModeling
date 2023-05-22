@@ -89,7 +89,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.ct_le.text() == "":
             self.ct_le.setText(str((1E+15 + 1E+17) / 2))
         if self.czh_le.text() == "":
-            self.czh_le.setText(str(1))
+            self.czh_le.setText(str(1E+17))
         if self.d_le.text() == "":
             self.d_le.setText(str(1))
         if self.czh_le.text() == "":
