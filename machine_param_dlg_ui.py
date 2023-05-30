@@ -127,14 +127,14 @@ class Ui_Dialog(object):
         self.label.setText(_translate("Dialog", "Введите исходные данные"))
         self.label_7.setText(_translate("Dialog", "Степень компенсации:"))
         self.label_5.setText(_translate("Dialog", "Диаметр тигля Dт (см):"))
-        self.label_3.setText(_translate("Dialog", "Скорость вращения тигля (w_t):"))
+        self.label_3.setText(_translate("Dialog", "Скорость вращения тигля (рад/с):"))
         self.label_6.setText(_translate("Dialog", "Диаметр кристалла Dкр (см):"))
         self.w_t_le.setToolTip(_translate("Dialog", "Принимает значения от 0 до 15"))
         self.w_t_le.setStatusTip(_translate("Dialog", "Принимает значения от 0 до 15"))
         self.w_kr_le.setToolTip(_translate("Dialog", "Принимает значения от 0 до 100"))
         self.w_kr_le.setStatusTip(_translate("Dialog", "Принимает значения от 0 до 100"))
         self.lineEdit_4.setText(_translate("Dialog", "на стадии реализации"))
-        self.label_2.setText(_translate("Dialog", "Скорость вращения кристалла (w_kr):"))
+        self.label_2.setText(_translate("Dialog", "Скорость вращения кристалла (рад/с):"))
 
 
 if __name__ == "__main__":

@@ -33,7 +33,7 @@ class GraphWidget(QDialog):
         y0 = np.empty(x0.size)
         for i in range(x0.size):
             y0[i] = calculation.diff_layer_thickness(substance_type, mu, ro, w_kr, x0[i])
-        self.add_plot(x0, y0, "Распределение примеси по длине кристаллов", "Axis Y title", "x title")
+        self.add_plot(x0, y0, "Распределение примеси по длине кристаллов", "Коэффициент распределения", "Длина кристалла")
 
     def fill_second_graph(self, k, c0):
         x0 = np.arange(start=0, stop=1, step=0.001)
@@ -41,4 +41,4 @@ class GraphWidget(QDialog):
         for i in range(x0.size):
             y0[i] = calculation.C_t(k, c0, x0[i])
         self.add_plot(x0, y0, "Зависимость толщины диффузного слоя от скорости вращения кристалла относительно тигля",
-                      "Axis Y title", "x title")
+                      "Толщина диффузного слоя", "Скорость вращения кристалла")

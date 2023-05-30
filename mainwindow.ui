@@ -21,10 +21,18 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="9" column="0">
+     <widget class="QLabel" name="label_18">
+      <property name="text">
+       <string>Изменение плотности основного
+вещества (кг/м^3)</string>
+      </property>
+     </widget>
+    </item>
     <item row="12" column="0">
      <widget class="QLabel" name="label_11">
       <property name="text">
-       <string>Площадь кристалла (Sкр):</string>
+       <string>Площадь кристалла (м^2):</string>
       </property>
      </widget>
     </item>
@@ -57,22 +65,6 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="1">
-     <widget class="QLineEdit" name="ro_le">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>178</width>
-        <height>22</height>
-       </size>
-      </property>
-     </widget>
-    </item>
     <item row="4" column="1">
      <widget class="QLineEdit" name="c0_le">
       <property name="sizePolicy">
@@ -96,21 +88,46 @@
      <widget class="QLabel" name="label_20">
       <property name="text">
        <string>Концентрация примеси в твердом
-состоянии (Cт)</string>
+состоянии (г/л)</string>
       </property>
      </widget>
     </item>
     <item row="5" column="0">
      <widget class="QLabel" name="label_16">
       <property name="text">
-       <string>Динамическая вязкость (mu)</string>
+       <string>Динамическая вязкость (Н*с/м^2)</string>
       </property>
      </widget>
     </item>
-    <item row="11" column="0">
-     <widget class="QLabel" name="label_17">
+    <item row="6" column="1">
+     <widget class="QLineEdit" name="ro_le">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>178</width>
+        <height>22</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_7">
       <property name="text">
-       <string>Масса в долях (yi)</string>
+       <string>Начальная концентрация
+примеси Co (cм^-3):</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="label_19">
+      <property name="text">
+       <string>Концентрация примеси в жидком
+состоянии (г/л)</string>
       </property>
      </widget>
     </item>
@@ -133,6 +150,13 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="2" rowspan="15">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
     <item row="8" column="1">
      <widget class="QLineEdit" name="czh_le">
       <property name="sizePolicy">
@@ -149,44 +173,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="2" rowspan="15">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="0">
-     <widget class="QLabel" name="label_19">
-      <property name="text">
-       <string>Концентрация примеси в жидком
-состоянии (Cж)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_7">
-      <property name="text">
-       <string>Начальная концентрация
-примеси Co (cм^-3):</string>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="0">
-     <widget class="QLabel" name="label_21">
-      <property name="text">
-       <string>Молярная масса компонента (mu_i)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="0">
-     <widget class="QLabel" name="label_18">
-      <property name="text">
-       <string>Изменение плотности основного
-вещества (d)</string>
-      </property>
-     </widget>
-    </item>
     <item row="9" column="1">
      <widget class="QLineEdit" name="d_le">
       <property name="sizePolicy">
@@ -200,6 +186,13 @@
         <width>178</width>
         <height>22</height>
        </size>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="0">
+     <widget class="QLabel" name="label_21">
+      <property name="text">
+       <string>Молярная масса компонента (г/моль)</string>
       </property>
      </widget>
     </item>
@@ -242,7 +235,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Оценка толщины диффузного слоя:</string>
+          <string>Оценка толщины диффузного слоя (мм):</string>
          </property>
         </widget>
        </item>
@@ -375,7 +368,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Диаметр тигля:</string>
+          <string>Диаметр тигля (мм):</string>
          </property>
         </widget>
        </item>
@@ -408,6 +401,25 @@
       </layout>
      </widget>
     </item>
+    <item row="7" column="1">
+     <widget class="QLineEdit" name="ct_le">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>178</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="statusTip">
+       <string>Принимает значения от 10^15 до 10^17</string>
+      </property>
+     </widget>
+    </item>
     <item row="3" column="0">
      <widget class="QLabel" name="label_6">
       <property name="text">
@@ -437,42 +449,56 @@
       </property>
      </widget>
     </item>
-    <item row="7" column="1">
-     <widget class="QLineEdit" name="ct_le">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+    <item row="13" column="0" colspan="2">
+     <spacer name="verticalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-      <property name="maximumSize">
+      <property name="sizeType">
+       <enum>QSizePolicy::MinimumExpanding</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
        <size>
-        <width>178</width>
-        <height>22</height>
+        <width>398</width>
+        <height>128</height>
        </size>
       </property>
-      <property name="statusTip">
-       <string>Принимает значения от 10^15 до 10^17</string>
+     </spacer>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_10">
+      <property name="text">
+       <string>Плотность жидкости (кг/м^3)</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="f_le">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>178</width>
-        <height>22</height>
-       </size>
-      </property>
-      <property name="statusTip">
-       <string>Скорость кристаллизации, принимает значения от 0 до 15 мм/мин</string>
-      </property>
+    <item row="2" column="0" colspan="2">
+     <widget class="QComboBox" name="substance_type_cb">
+      <item>
+       <property name="text">
+        <string>Выберите примесь</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>B - Бром</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>P - Фосфор (летучая)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>As - Мышьяк</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sb - Сурьма (летучая)</string>
+       </property>
+      </item>
      </widget>
     </item>
     <item row="14" column="0" colspan="2">
@@ -504,56 +530,23 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="0">
-     <widget class="QLabel" name="label_10">
-      <property name="text">
-       <string>Плотность жидкости (ro)</string>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="f_le">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-     </widget>
-    </item>
-    <item row="13" column="0" colspan="2">
-     <spacer name="verticalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::MinimumExpanding</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
+      <property name="maximumSize">
        <size>
-        <width>398</width>
-        <height>128</height>
+        <width>178</width>
+        <height>22</height>
        </size>
       </property>
-     </spacer>
-    </item>
-    <item row="2" column="0" colspan="2">
-     <widget class="QComboBox" name="substance_type_cb">
-      <item>
-       <property name="text">
-        <string>Выберите примесь</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>B - Бром</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>P - Фосфор (летучая)</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>As - Мышьяк</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Sb - Сурьма (летучая)</string>
-       </property>
-      </item>
+      <property name="statusTip">
+       <string>Скорость кристаллизации, принимает значения от 0 до 15 мм/мин</string>
+      </property>
      </widget>
     </item>
     <item row="0" column="3" rowspan="15">
@@ -582,6 +575,13 @@
        </layout>
       </widget>
       <widget class="QWidget" name="graph_page"/>
+     </widget>
+    </item>
+    <item row="11" column="0">
+     <widget class="QLabel" name="label_17">
+      <property name="text">
+       <string>Масса в долях (%)</string>
+      </property>
      </widget>
     </item>
    </layout>

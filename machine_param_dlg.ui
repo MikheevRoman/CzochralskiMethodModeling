@@ -161,7 +161,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Скорость вращения тигля (w_t):</string>
+      <string>Скорость вращения тигля (рад/с):</string>
      </property>
     </widget>
    </item>
@@ -226,7 +226,7 @@
    <item row="2" column="0" colspan="3">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Скорость вращения кристалла (w_kr):</string>
+      <string>Скорость вращения кристалла (рад/с):</string>
      </property>
     </widget>
    </item>
