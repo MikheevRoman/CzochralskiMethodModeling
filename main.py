@@ -106,7 +106,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # primes' setup
     substance_type = 0.0
-    mu = 0.0    # [0.001, 0.1]
+    mu = 0.0
     ro = 0.0
     c_t = 0.0   # [1E+15, 1E+17]
     c_zh = 0.0  #
