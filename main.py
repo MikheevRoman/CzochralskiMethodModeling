@@ -3,7 +3,12 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from mainwindow import Ui_MainWindow
 from graph_viewer import GraphWidget
 from machine_param_dlg import *
+from anime import playing_animation
 import calculation
+
+import sys
+import pygame
+
 
 
 # реализовать защиту от дурака и независимость ввода параметров
@@ -164,6 +169,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if self.s_kr_le.text() == "":
             self.d_t_l.setText("-")
+
+        playing_animation(self.w_t, self.w_kr)
 
         graph = GraphWidget()
         graph.fill_first_graph(self.substance_type, self.mu, self.ro, self.w_kr)
