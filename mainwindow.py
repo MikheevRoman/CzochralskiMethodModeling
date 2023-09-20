@@ -379,6 +379,7 @@ class Ui_MainWindow(object):
         self.set_fullscreen.setText(_translate("MainWindow", "Включить"))
         self.disable_fullscreen.setText(_translate("MainWindow", "Выключить"))
         self.input_rules_action.setText(_translate("MainWindow", "Правила ввода"))
+        self.change_graph_settings_action.setText(_translate("MainWindow", "Настройка графиков"))
 
 
 if __name__ == "__main__":
