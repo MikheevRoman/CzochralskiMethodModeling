@@ -1,12 +1,16 @@
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QDialog, QColorDialog
 from graph_settings_ui import Ui_Dialog
+from graph_viewer import GraphWidget
 
 
 class GraphSettings(QDialog, Ui_Dialog):
     pen_color = QColor()
     background_color = QColor()
     pen_width = 2
+
+    background_color_rgb = (227, 227, 227)
+    pen_color_rgb = (31, 17, 140)
 
     def __init__(self):
         super().__init__()
@@ -19,16 +23,22 @@ class GraphSettings(QDialog, Ui_Dialog):
         self.set_background_color_btn.clicked.connect(lambda: self.set_background_color())
 
     def set_pen_color(self):    # выбор цвета пера
-        if QColor.isValid(QColorDialog.getColor(self.pen_color)):
-            print(self.pen_color)
+        selected_color = QColorDialog.getColor(self.pen_color)
+
+        if selected_color.isValid():
+            self.pen_color_rgb = (selected_color.red(), selected_color.green(), selected_color.blue())
+            print(self.pen_color_rgb)
 
     def set_background_color(self):    # выбор цвета фона
-        if QColor.isValid(QColorDialog.getColor(self.background_color)):
-            print(self.background_color)
+        selected_color = QColorDialog.getColor(self.background_color)
+
+        if selected_color.isValid():
+            self.background_color_rgb = (selected_color.red(), selected_color.green(), selected_color.blue())
+            print(self.background_color_rgb)
 
     def accept_settings(self):
         self.pen_width = int(self.pen_width_le.text())
-        # MainGraphSettings.pen_color = self.pen_color
-        # MainGraphSettings.pen_width = self.pen_width
-        # MainGraphSettings.background_color = self.background_color
+        GraphWidget.background_color = self.background_color_rgb
+        GraphWidget.pen_color = self.pen_color_rgb
+        GraphWidget.width = self.pen_width
         self.close()
