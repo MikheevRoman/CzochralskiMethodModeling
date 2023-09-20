@@ -592,7 +592,7 @@
      <x>0</x>
      <y>0</y>
      <width>1361</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -607,6 +607,7 @@
      <string>Моделирование</string>
     </property>
     <addaction name="change_machine_setup_action"/>
+    <addaction name="change_graph_settings_action"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -649,6 +650,11 @@
   <action name="input_rules_action">
    <property name="text">
     <string>Правила ввода</string>
+   </property>
+  </action>
+  <action name="change_graph_settings_action">
+   <property name="text">
+    <string>Настройка графиков</string>
    </property>
   </action>
  </widget>
