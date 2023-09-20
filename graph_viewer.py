@@ -7,6 +7,10 @@ import calculation
 
 
 class GraphWidget(QDialog):
+    background_color = (227, 227, 227)
+    pen_color = (31, 17, 140)
+    width = 2
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Графики")
@@ -22,8 +26,8 @@ class GraphWidget(QDialog):
         styles = {'color': 'g', 'font-size': '16px'}
         plot_widget.setLabel('left', axis_y_title, **styles)
         plot_widget.setLabel('bottom', axis_x_title, **styles)
-        plot_widget.setBackground((227, 227, 227))
-        pen = pg.mkPen(color=(31, 17, 140), width=2)    # pen painter
+        plot_widget.setBackground(self.background_color)
+        pen = pg.mkPen(color=self.pen_color, width=self.width)    # pen painter
         plot_widget.plot(x, y, pen=pen)
         new_layout.addWidget(plot_widget)
         self.setLayout(new_layout)
