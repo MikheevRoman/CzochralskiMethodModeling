@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from mainwindow import Ui_MainWindow
 from graph_viewer import GraphWidget
 from machine_param_dlg import *
+from graph_settings import *
 from anime import playing_animation
 import calculation
 
