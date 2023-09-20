@@ -35,6 +35,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.set_fullscreen.triggered.connect(lambda: self.showFullScreen())
         self.disable_fullscreen.triggered.connect(lambda: self.showMaximized())
         self.change_machine_setup_action.triggered.connect(lambda: self.change_setup())
+        self.change_graph_settings_action.triggered.connect(lambda: self.change_graph_settings())
         self.about_action.triggered.connect(lambda: QMessageBox.about(self, "О программе", "Разработана студентами "
                                                                                            "СПбГУТ"))
         self.input_rules_action.triggered.connect(lambda: QMessageBox.about(self, "Правила ввода данных", "Для ввода "
@@ -129,6 +130,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.w_t = dlg.w_t
         self.w_kr = dlg.w_kr
 
+    def change_graph_settings(self):
+        dlg = GraphSettings()
+        dlg.exec()
+        
     def start_process(self):
         self.set_parametrs_from_le()
         # защита от дурака
