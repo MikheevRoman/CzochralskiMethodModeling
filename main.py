@@ -125,6 +125,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     w_kr = -1.0  # [0, 100]
     w_t = -1.0   # [0, 15]
 
+
+
+
+
     def change_setup(self):
         dlg = MachineParametersDialog()
         dlg.exec()
@@ -134,7 +138,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def change_graph_settings(self):
         dlg = GraphSettings()
         dlg.exec()
-        
+
     def start_process(self):
         self.set_parametrs_from_le()
         # защита от дурака
@@ -179,6 +183,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         playing_animation(self.w_t, self.w_kr)
 
         graph = GraphWidget()
+
+        graph.data_collection()
         graph.fill_first_graph(self.substance_type, self.mu, self.ro, self.w_kr)
         graph.fill_second_graph(k, self.c0)
         graph.exec()
