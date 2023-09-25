@@ -87,8 +87,7 @@ class GraphSettings(QDialog, Ui_Dialog):
             "pen_width": self.pen_width
         }
 
-        json_file_path = "graph_veriables.json"
-
+        json_file_path = "graph_variables.json"
         with open(json_file_path, 'w') as json_file:
             json.dump(data, json_file)
 
