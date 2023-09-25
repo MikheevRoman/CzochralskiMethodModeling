@@ -592,7 +592,7 @@
      <x>0</x>
      <y>0</y>
      <width>1361</width>
-     <height>24</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -607,7 +607,6 @@
      <string>Моделирование</string>
     </property>
     <addaction name="change_machine_setup_action"/>
-    <addaction name="change_graph_settings_action"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -621,6 +620,8 @@
      <addaction name="disable_fullscreen"/>
     </widget>
     <addaction name="menu_4"/>
+    <addaction name="change_graph_setup_action"/>
+    <addaction name="set_text_size_action"/>
    </widget>
    <addaction name="menu_2"/>
    <addaction name="menu_3"/>
@@ -655,6 +656,16 @@
   <action name="change_graph_settings_action">
    <property name="text">
     <string>Настройка графиков</string>
+   </property>
+  </action>
+  <action name="change_graph_setup_action">
+   <property name="text">
+    <string>Настройка графиков</string>
+   </property>
+  </action>
+  <action name="set_text_size_action">
+   <property name="text">
+    <string>Размер шрифта</string>
    </property>
   </action>
  </widget>

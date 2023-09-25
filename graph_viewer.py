@@ -1,8 +1,6 @@
 import numpy as np
 import pyqtgraph as pg
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QDialog
-from PyQt5.QtCore import Qt
-import sys
+from PyQt5.QtWidgets import QVBoxLayout, QDialog
 import calculation
 import json
 
@@ -16,7 +14,6 @@ class GraphWidget(QDialog):
         self.setMinimumSize(600, 400)
         layout = QVBoxLayout()
         self.setLayout(layout)
-
 
     def add_plot(self, x, y, title="", axis_x_title="", axis_y_title=""):
         new_layout = self.layout()
@@ -46,7 +43,7 @@ class GraphWidget(QDialog):
         self.add_plot(x0, y0, "Зависимость толщины диффузного слоя от скорости вращения кристалла относительно тигля",
                       "Толщина диффузного слоя", "Скорость вращения кристалла")
 
-    def data_collection(self): # метод для считывания настроек графика из json
+    def data_collection(self):  # метод для считывания настроек графика из json
 
         # открытие файла json для чтения
         json_file_path = "graph_veriables.json"
@@ -54,6 +51,6 @@ class GraphWidget(QDialog):
             data = json.load(json_file)
 
         # считывание настроек графика из json
-        self.background_color = tuple(data["background_color"]) # задний фон графиков
-        self.pen_color = tuple(data["pen_color"]) # (цвет пера)
-        self.width = data["pen_width"] # (ширина пера)
+        self.background_color = tuple(data["background_color"])  # задний фон графиков
+        self.pen_color = tuple(data["pen_color"])  # (цвет пера)
+        self.width = data["pen_width"]  # (ширина пера)

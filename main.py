@@ -1,30 +1,18 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QInputDialog
 from mainwindow import Ui_MainWindow
 from graph_viewer import GraphWidget
 from machine_param_dlg import *
 from graph_settings import *
 from anime import playing_animation
 import calculation
-
 import sys
 import pygame
 
 
-
 # реализовать защиту от дурака и независимость ввода параметров
 # сброс выведенных значений после повторного моделирования
-
-# спросить про единицы измерения
-
-# руководство пользователя
-#
-# cопоставить программу с лабвью, отличия
-# технические характеристики
-# разработано: свойства,
-# достоинства программы
-#
-# наглядность (отрисовывать)
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -36,7 +24,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.set_fullscreen.triggered.connect(lambda: self.showFullScreen())
         self.disable_fullscreen.triggered.connect(lambda: self.showMaximized())
         self.change_machine_setup_action.triggered.connect(lambda: self.change_setup())
-        self.change_graph_settings_action.triggered.connect(lambda: self.change_graph_settings())
+        self.change_graph_setup_action.triggered.connect(lambda: self.change_graph_settings())
         self.about_action.triggered.connect(lambda: QMessageBox.about(self, "О программе", "Разработана студентами "
                                                                                            "СПбГУТ"))
         self.input_rules_action.triggered.connect(lambda: QMessageBox.about(self, "Правила ввода данных", "Для ввода "
@@ -45,6 +33,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                                                                 "например, "
                                                                                 "число 2.1*10^15 вводите как 2.1E+15, "
                                                                                 "число 3.45*10^(-7) - как 3.45E-7"))
+        self.set_text_size_action.triggered.connect(lambda: self.set_text_size())
+
+    # настройка шрифта
+    def set_text_size(self):
+        size = QInputDialog.getText(self, "Параметры шрифта", "Размер шрифта:")
+        font = QFont("MS Shell Dlg 2", size)
+        lst = [self.label, self.label_2, self.label_3, self.label_4]  # вносим в список надписи
+        for label in lst:
+            label.setFont(font)
 
     def float_check(self):  # проверка
         superMegaString3000 = self.f_le.text() + self.c0_le.text() + self.mu_le.text() + self.ro_le.text() \
@@ -65,7 +62,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.warning(self, "Ошибка", "Вы не выбрали примесь")
             return False
         if self.float_check():
-            QMessageBox.warning(self, "Ошибка", "Вы ввели число неправильно \"Правила ввода\" в разделе \"Справка\"")
+            QMessageBox.warning(self, "Ошибка", "Вы ввели число неправильно, посмотрите \"Правила ввода\""
+                                                "в разделе \"Справка\"")
             return False
         if float(self.f_le.text()) < 0 or float(self.f_le.text()) > 15:
             QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую скорость кристаллизации f (мм/мин)")
@@ -110,8 +108,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QMessageBox.about(self, "О программе", "Разработана студентами СПбГУТ")
 
     # Dж - коэффициент диффузии в сплаве
-
-    # primes' setup
+    # параметры примеси
     substance_type = 0.0
     mu = 0.0
     ro = 0.0
@@ -124,10 +121,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # machine setup
     w_kr = -1.0  # [0, 100]
     w_t = -1.0   # [0, 15]
-
-
-
-
 
     def change_setup(self):
         dlg = MachineParametersDialog()
