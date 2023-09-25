@@ -78,16 +78,18 @@ class GraphSettings(QDialog, Ui_Dialog):
             self.background_color_rgb = (selected_color.red(), selected_color.green(), selected_color.blue())
             print(self.background_color_rgb)
 
-    def accept_settings(self):
+    def accept_settings(self): # ок, (сохранить изменения)
         self.pen_width = int(self.pen_width_le.text())
 
+        # словарь для записи новых настроек графика в json
         data = {
-            "background_color": self.background_color_rgb,
-            "pen_color": self.pen_color_rgb,
-            "pen_width": self.pen_width
+            "background_color": self.background_color_rgb, # цвет заднего фона графиков
+            "pen_color": self.pen_color_rgb, # цвет пера
+            "pen_width": self.pen_width # ширина пера
         }
 
-        json_file_path = "graph_variables.json"
+        # запись настроек графика в json
+        json_file_path = "graph_veriables.json"
         with open(json_file_path, 'w') as json_file:
             json.dump(data, json_file)
 
