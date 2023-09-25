@@ -4,12 +4,19 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLa
 from PyQt5.QtCore import Qt
 import sys
 import calculation
+import json
 
 
 class GraphWidget(QDialog):
-    background_color = (227, 227, 227)
-    pen_color = (31, 17, 140)
-    width = 2
+
+    json_file_path = "graph_veriables.json"
+
+    with open(json_file_path, 'r') as json_file:
+        data = json.load(json_file)
+
+    background_color = tuple(data["background_color"])
+    pen_color = tuple(data["pen_color"])
+    width = data["pen_width"]
 
     def __init__(self):
         super().__init__()
