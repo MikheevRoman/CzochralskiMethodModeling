@@ -46,12 +46,14 @@ class GraphWidget(QDialog):
         self.add_plot(x0, y0, "Зависимость толщины диффузного слоя от скорости вращения кристалла относительно тигля",
                       "Толщина диффузного слоя", "Скорость вращения кристалла")
 
-    def data_collection(self):
-        json_file_path = "graph_variables.json"
+    def data_collection(self): # метод для считывания настроек графика из json
 
+        # открытие файла json для чтения
+        json_file_path = "graph_veriables.json"
         with open(json_file_path, 'r') as json_file:
             data = json.load(json_file)
 
-        self.background_color = tuple(data["background_color"])
-        self.pen_color = tuple(data["pen_color"])
-        self.width = data["pen_width"]
+        # считывание настроек графика из json
+        self.background_color = tuple(data["background_color"]) # задний фон графиков
+        self.pen_color = tuple(data["pen_color"]) # (цвет пера)
+        self.width = data["pen_width"] # (ширина пера)
