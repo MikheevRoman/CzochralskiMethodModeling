@@ -47,7 +47,7 @@ class GraphWidget(QDialog):
                       "Толщина диффузного слоя", "Скорость вращения кристалла")
 
     def data_collection(self):
-        json_file_path = "graph_veriables.json"
+        json_file_path = "graph_variables.json"
 
         with open(json_file_path, 'r') as json_file:
             data = json.load(json_file)
