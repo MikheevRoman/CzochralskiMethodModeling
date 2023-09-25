@@ -9,15 +9,6 @@ import json
 
 class GraphWidget(QDialog):
 
-    json_file_path = "graph_veriables.json"
-
-    with open(json_file_path, 'r') as json_file:
-        data = json.load(json_file)
-
-    background_color = tuple(data["background_color"])
-    pen_color = tuple(data["pen_color"])
-    width = data["pen_width"]
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Графики")
@@ -25,6 +16,7 @@ class GraphWidget(QDialog):
         self.setMinimumSize(600, 400)
         layout = QVBoxLayout()
         self.setLayout(layout)
+
 
     def add_plot(self, x, y, title="", axis_x_title="", axis_y_title=""):
         new_layout = self.layout()
@@ -53,3 +45,13 @@ class GraphWidget(QDialog):
             y0[i] = calculation.C_t(k, c0, x0[i])
         self.add_plot(x0, y0, "Зависимость толщины диффузного слоя от скорости вращения кристалла относительно тигля",
                       "Толщина диффузного слоя", "Скорость вращения кристалла")
+
+    def data_collection(self):
+        json_file_path = "graph_veriables.json"
+
+        with open(json_file_path, 'r') as json_file:
+            data = json.load(json_file)
+
+        self.background_color = tuple(data["background_color"])
+        self.pen_color = tuple(data["pen_color"])
+        self.width = data["pen_width"]
