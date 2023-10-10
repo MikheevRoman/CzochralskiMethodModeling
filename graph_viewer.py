@@ -46,7 +46,7 @@ class GraphWidget(QDialog):
     def data_collection(self):  # метод для считывания настроек графика из json
 
         # открытие файла json для чтения
-        json_file_path = "graph_veriables.json"
+        json_file_path = "graph_variables.json"
         with open(json_file_path, 'r') as json_file:
             data = json.load(json_file)
 

@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QInputDialog
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QInputDialog, QFontDialog
 from mainwindow import Ui_MainWindow
 from graph_viewer import GraphWidget
 from machine_param_dlg import *
@@ -37,11 +37,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # настройка шрифта
     def set_text_size(self):
-        size = QInputDialog.getText(self, "Параметры шрифта", "Размер шрифта:")
-        font = QFont("MS Shell Dlg 2", size)
-        lst = [self.label, self.label_2, self.label_3, self.label_4]  # вносим в список надписи
+        font = QFontDialog.getFont(self)[0]
+        lst = [self.label_2, self.label_6, self.label_7, self.label_16, self.label_10, self.label_20, self.label_19,
+               self.label_18, self.label_21, self.label_17, self.label_11, self.label_3, self.label_4, self.label_8,
+               self.label_9, self.label_13, self.label_14, self.delta_mean_l, self.k_mean_l, self.ki_mean_l, self.kob_l,
+               self.d_t_l, self.label]  # вносим в список надписи
         for label in lst:
             label.setFont(font)
+        self.substance_type_cb.setFont(font)
+        self.start_process_btn.setFont(font)
+        self.output_box.setFont(font)
+
 
     def float_check(self):  # проверка
         superMegaString3000 = self.f_le.text() + self.c0_le.text() + self.mu_le.text() + self.ro_le.text() \
