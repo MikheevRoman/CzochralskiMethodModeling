@@ -6,6 +6,7 @@ import json
 
 
 class GraphWidget(QDialog):
+    my_layout = None
 
     def __init__(self):
         super().__init__()
@@ -14,6 +15,9 @@ class GraphWidget(QDialog):
         self.setMinimumSize(600, 400)
         layout = QVBoxLayout()
         self.setLayout(layout)
+
+    def return_graph_layout(self):
+        return self.layout()
 
     def add_plot(self, x, y, title="", axis_x_title="", axis_y_title=""):
         new_layout = self.layout()

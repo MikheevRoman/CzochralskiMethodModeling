@@ -1,1 +1,5 @@
-{"background_color": [227, 227, 227], "pen_color": [255, 255, 0], "pen_width": 2}
+{
+	"background_color": [255, 255, 255],
+	"pen_color": [31, 17, 140],
+	"pen_width": 2
+}

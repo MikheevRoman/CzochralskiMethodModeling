@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QInputDialog, QFontDialog
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QInputDialog, QFontDialog, QVBoxLayout, QLabel
 from mainwindow import Ui_MainWindow
 from graph_viewer import GraphWidget
 from machine_param_dlg import *
@@ -14,6 +14,25 @@ import pygame
 # реализовать защиту от дурака и независимость ввода параметров
 # сброс выведенных значений после повторного моделирования
 class MainWindow(QMainWindow, Ui_MainWindow):
+    # Dж - коэффициент диффузии в сплаве
+    # параметры примеси
+    substance_type = 0.0
+    mu = 0.0
+    ro = 0.0
+    c_t = 0.0  # [1E+15, 1E+17]
+    c_zh = 0.0  #
+    f = 0.0  # [0, 15]
+    c0 = 0.0  # [1E+10, 1E+15]
+    s_kr = 0.0  # задается площадь кристалла
+    # alpha = 0.0  # коэффициент испарения из жидкой фазы
+    # machine setup
+    w_kr = -1.0  # [0, 100]
+    w_t = -1.0  # [0, 15]
+
+    # SYSTEM SETTINGS
+    animation_enabled = False
+    graph_modality = False  # false - widget, true - window
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -27,13 +46,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.change_graph_setup_action.triggered.connect(lambda: self.change_graph_settings())
         self.about_action.triggered.connect(lambda: QMessageBox.about(self, "О программе", "Разработана студентами "
                                                                                            "СПбГУТ"))
+        self.graph_modality_act.triggered.connect(lambda: self.set_graph_modality())
+        self.animation_enable_act.triggered.connect(lambda: self.set_animation())
         self.input_rules_action.triggered.connect(lambda: QMessageBox.about(self, "Правила ввода данных", "Для ввода "
-                                                                                "чисел формата a*10^n используйте "
-                                                                                "экспоненциальную форму записи числа: "
-                                                                                "например, "
-                                                                                "число 2.1*10^15 вводите как 2.1E+15, "
-                                                                                "число 3.45*10^(-7) - как 3.45E-7"))
+                                                                                                          "чисел формата a*10^n используйте "
+                                                                                                          "экспоненциальную форму записи числа: "
+                                                                                                          "например, "
+                                                                                                          "число 2.1*10^15 вводите как 2.1E+15, "
+                                                                                                          "число 3.45*10^(-7) - как 3.45E-7"))
         self.set_text_size_action.triggered.connect(lambda: self.set_text_size())
+
+    def set_graph_modality(self):
+        self.graph_modality = not self.graph_modality
+
+    def set_animation(self):
+        self.animation_enabled = not self.animation_enabled
 
     # настройка шрифта
     def set_text_size(self):
@@ -47,7 +74,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.substance_type_cb.setFont(font)
         self.start_process_btn.setFont(font)
         self.output_box.setFont(font)
-
 
     def float_check(self):  # проверка
         superMegaString3000 = self.f_le.text() + self.c0_le.text() + self.mu_le.text() + self.ro_le.text() \
@@ -113,21 +139,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_about(self):
         QMessageBox.about(self, "О программе", "Разработана студентами СПбГУТ")
 
-    # Dж - коэффициент диффузии в сплаве
-    # параметры примеси
-    substance_type = 0.0
-    mu = 0.0
-    ro = 0.0
-    c_t = 0.0   # [1E+15, 1E+17]
-    c_zh = 0.0  #
-    f = 0.0  # [0, 15]
-    c0 = 0.0  # [1E+10, 1E+15]
-    s_kr = 0.0  # задается площадь кристалла
-    # alpha = 0.0  # коэффициент испарения из жидкой фазы
-    # machine setup
-    w_kr = -1.0  # [0, 100]
-    w_t = -1.0   # [0, 15]
-
     def change_setup(self):
         dlg = MachineParametersDialog()
         dlg.exec()
@@ -156,17 +167,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         k = calculation.impurity_distribution_coef(self.c_t, self.c_zh, self.substance_type, self.f, delta)
 
         # ui output setup
-        self.delta_mean_l.setText(str(delta))
-        self.k_mean_l.setText(str(k))
+        self.delta_mean_l.setText(str(delta.__round__(3)))
+        self.k_mean_l.setText(str(k.__round__(3)))
         if self.substance_type == 2 or self.substance_type == 4:
             ki = calculation.k_i(self.substance_type)
             k_ob = calculation.k_ob(k, ki)
-            self.ki_mean_l.setText(str(ki))
-            self.kob_l.setText(str(k_ob))
+            self.ki_mean_l.setText(str(ki.__round__(3)))
+            self.kob_l.setText(str(k_ob.__round__(3)))
             if self.s_kr_le.text() != "":
                 self.s_kr = float(self.s_kr_le.text())
                 D_t = calculation.D_t(self.s_kr, ki, k, self.f)
-                self.d_t_l.setText(str(D_t))
+                self.d_t_l.setText(str(D_t.__round__(3)))
             elif self.s_kr_le.text() == "":
                 pass
             else:
@@ -179,19 +190,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.s_kr_le.text() == "":
             self.d_t_l.setText("-")
 
-        playing_animation(self.w_t, self.w_kr)
+        if self.animation_enabled:
+            playing_animation(self.w_t, self.w_kr)  # проигрывание анимации
 
         graph = GraphWidget()
-
         graph.data_collection()
         graph.fill_first_graph(self.substance_type, self.mu, self.ro, self.w_kr)
         graph.fill_second_graph(k, self.c0)
-        graph.exec()
-        self.stackedWidget.setCurrentIndex(1)
+
+        self.stackedWidget.addWidget(QtWidgets.QWidget())   # добавляем пустой виджет в стек-виджет
+        self.stackedWidget.setCurrentIndex(self.stackedWidget.currentIndex() + 1)
+        if self.graph_modality:  # если график в отдельном окне
+            layout = QVBoxLayout()
+            self.stackedWidget.currentWidget().setLayout(layout)
+            graph.exec()
+        else:   # если график в главном окне
+            self.stackedWidget.currentWidget().setLayout(graph.return_graph_layout())
+            graph.close()
 
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()

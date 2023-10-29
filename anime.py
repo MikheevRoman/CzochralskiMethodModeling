@@ -3,7 +3,7 @@ import pygame
 
 def playing_animation(w_t, w_kr):
     pygame.init()
-
+    pygame.display.set_icon(pygame.Surface((1, 1)))
     pygame.display.set_caption("Графическое представление")
 
     # берем информацию об экране
@@ -20,8 +20,8 @@ def playing_animation(w_t, w_kr):
     light_orange = (255, 79, 0)
 
     # спиды
-    palka_speed = 1
-    lava_speed = 0.3
+    palka_speed = 0.8
+    lava_speed = 0.1
 
     # 1 деталь (малый прямоугольник) корпуса
     first_frame_x = screen_width / 2 - screen_width / 16
