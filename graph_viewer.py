@@ -1,3 +1,4 @@
+import PyQt5.QtCore
 import numpy as np
 import pyqtgraph as pg
 from PyQt5.QtWidgets import QVBoxLayout, QDialog
@@ -6,8 +7,6 @@ import json
 
 
 class GraphWidget(QDialog):
-    my_layout = None
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Графики")
@@ -23,7 +22,7 @@ class GraphWidget(QDialog):
         new_layout = self.layout()
         plot_widget = pg.PlotWidget()
         plot_widget.setTitle(title, color=(0, 0, 0))
-        styles = {'color': 'g', 'font-size': '16px'}
+        styles = {'color': self.axis_label_color, 'font-size': '16px'}
         plot_widget.setLabel('left', axis_y_title, **styles)
         plot_widget.setLabel('bottom', axis_x_title, **styles)
         plot_widget.setBackground(self.background_color)
@@ -56,5 +55,6 @@ class GraphWidget(QDialog):
 
         # считывание настроек графика из json
         self.background_color = tuple(data["background_color"])  # задний фон графиков
+        self.axis_label_color = tuple(data["axis_label_color"])  # цвет подписей
         self.pen_color = tuple(data["pen_color"])  # (цвет пера)
         self.width = data["pen_width"]  # (ширина пера)
