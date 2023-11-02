@@ -27,6 +27,13 @@ class GraphWidget(QDialog):
         plot_widget.setLabel('bottom', axis_x_title, **styles)
         plot_widget.setBackground(self.background_color)
         pen = pg.mkPen(color=self.pen_color, width=self.width)    # pen painter
+
+        color_string = '#{0:02X}{1:02X}{2:02X}'.format(*self.axis_label_color)
+        axis = plot_widget.getAxis('bottom')
+        axis2 = plot_widget.getAxis('left')
+        axis.setPen(color_string)
+        axis2.setPen(color_string)
+
         plot_widget.plot(x, y, pen=pen)
         new_layout.addWidget(plot_widget)
         self.setLayout(new_layout)
