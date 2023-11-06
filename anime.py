@@ -1,6 +1,13 @@
 import pygame
 
 
+def draw_text(screen, text, x, y, font_size, font_color): # надпись
+    font = pygame.font.Font(None, font_size)
+    text_surface = font.render(text, True, font_color)
+    screen.blit(text_surface, (x, y))
+
+
+
 def playing_animation(w_t, w_kr):
     pygame.init()
     pygame.display.set_icon(pygame.Surface((1, 1)))
@@ -9,7 +16,11 @@ def playing_animation(w_t, w_kr):
     # берем информацию об экране
     screen_width = 1000
     screen_height = 800
-    screen = pygame.display.set_mode((screen_width, screen_height))
+
+    screen_w = 1200
+    screen_h = 1000
+
+    screen = pygame.display.set_mode((screen_w, screen_h))
 
     # цвета
     white = (255, 255, 255)
@@ -24,7 +35,7 @@ def playing_animation(w_t, w_kr):
     lava_speed = 0.1
 
     # 1 деталь (малый прямоугольник) корпуса
-    first_frame_x = screen_width / 2 - screen_width / 16
+    first_frame_x = screen_width / 2 - screen_width / 16 + 100
     first_frame_y = 0
     first_frame_width = screen_width / 8
     first_frame_height = screen_height / 15
@@ -124,27 +135,27 @@ def playing_animation(w_t, w_kr):
     seventh_glass_color = orange
 
     # 1 деталь (белый прямоугольник сверху) палка
-    first_palka_x = screen_width / 2 - first_frame_width / 4
+    first_palka_x = screen_width / 2 - first_frame_width / 4 + 100
     first_palka_y = 0
     first_palka_width = first_frame_width / 2
     first_palka_height = first_frame_height * 3
     first_palka_color = white
 
     # 2 деталь (тонкая палка) палка
-    second_palka_x = screen_width / 2 - first_frame_width / 16
+    second_palka_x = screen_width / 2 - first_frame_width / 16 + 100
     second_palka_y = 0
     second_palka_width = first_frame_width / 8
     second_palka_height = first_frame_height * 8.5
     second_palka_color = light_grey
 
     # 3 деталь (треугольник) от палки
-    third_palka_points = [(screen_width / 2 - first_frame_width * 0.006, first_frame_height * 8.4),
-                          (screen_width / 2 - first_frame_width / 4, first_frame_height * 8.75),
-                          (screen_width / 2 + first_frame_width / 4, first_frame_height * 8.75)]  # верх, лево, право
+    third_palka_points = [(screen_width / 2 - first_frame_width * 0.006 + 100, first_frame_height * 8.4),
+                          (screen_width / 2 - first_frame_width / 4 + 100, first_frame_height * 8.75),
+                          (screen_width / 2 + first_frame_width / 4 + 100, first_frame_height * 8.75)]  # верх, лево, право
     third_palka_color = light_orange
 
     # 4 деталь (толстая палка) лава
-    fourth_palka_x = screen_width / 2 - first_frame_width / 4
+    fourth_palka_x = screen_width / 2 - first_frame_width / 4  + 100
     fourth_palka_y = first_frame_height * 8.75
     fourth_palka_width = first_frame_width / 2
     fourth_palka_height = first_frame_height * 3.25
@@ -166,6 +177,7 @@ def playing_animation(w_t, w_kr):
         # Заливка экрана цветов
         screen.fill(white)
 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -175,9 +187,9 @@ def playing_animation(w_t, w_kr):
                         animation_started = True
                         second_palka_y = 0
                         fourth_palka_y = first_frame_height * 8.75
-                        third_palka_points = [(screen_width / 2 - first_frame_width * 0.006, first_frame_height * 8.4),
-                                              (screen_width / 2 - first_frame_width / 4, first_frame_height * 8.75),
-                                              (screen_width / 2 + first_frame_width / 4, first_frame_height * 8.75)]
+                        third_palka_points = [(screen_width / 2 - first_frame_width * 0.006 + 100, first_frame_height * 8.4),
+                                              (screen_width / 2 - first_frame_width / 4 + 100, first_frame_height * 8.75),
+                                              (screen_width / 2 + first_frame_width / 4 + 100, first_frame_height * 8.75)]
                         sixth_glass_y = first_frame_height * 8
                         sixth_glass_height = first_frame_height * 4
                         seventh_glass_points = (first_frame_x - first_frame_width * 1.5,
@@ -185,10 +197,14 @@ def playing_animation(w_t, w_kr):
                                                 first_frame_width * 5 / 1.25,
                                                 first_frame_height * 5 / 1.25)
 
+
         if fourth_palka_y <= first_frame_height * 3:
             animation_started = False
 
         if animation_started:
+
+
+
             second_palka_y -= palka_speed
             fourth_palka_y -= palka_speed
 
@@ -269,6 +285,33 @@ def playing_animation(w_t, w_kr):
         # 5 деталь (правый прямоугольник) стакан
         pygame.draw.rect(screen, fifth_glass_color,
                          (fifth_glass_x, fifth_glass_y, fifth_glass_width, fifth_glass_height))
+
+        draw_text(screen, f"Скорость вращения тигля: {w_t:.2f}", 800, 20, 30, (0, 0, 0))
+        draw_text(screen, f"Скорость вращения кристалла: {w_kr:.2f}", 800, 50, 30, (0, 0, 0))
+
+
+        draw_text(screen, "Жирная оболочка", 950, 150, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 155), (800, 110), 2)
+
+        draw_text(screen, "Тонкая палка", 950, 200, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 205), (second_palka_x+second_palka_width/2, second_palka_y+second_palka_height*0.8), 2)
+
+        draw_text(screen, "Кристалл кремния", 950, 250, 30, (0, 0, 0))
+        if(fourth_palka_y+fourth_palka_height/2 < sixth_glass_y):
+            pygame.draw.line(screen, (0, 0, 0), (945, 255), (fourth_palka_x+fourth_palka_width/2, fourth_palka_y+fourth_palka_height/2), 2)
+
+        draw_text(screen, "Грани стакана", 950, 300, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 305), (770, 385), 2)
+
+        draw_text(screen, "Тонкая оболочка", 950, 350, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 355), (835, 420), 2)
+
+        draw_text(screen, "Лава", 950, 400, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 405), (sixth_glass_x+sixth_glass_width/2, sixth_glass_y+sixth_glass_height/2), 2)
+
+
+
+
 
         pygame.time.delay(10)
 
