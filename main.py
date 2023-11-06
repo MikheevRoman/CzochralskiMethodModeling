@@ -10,9 +10,8 @@ import calculation
 import sys
 import pygame
 
+# параметр ti нигде не используется
 
-# реализовать защиту от дурака и независимость ввода параметров
-# сброс выведенных значений после повторного моделирования
 class MainWindow(QMainWindow, Ui_MainWindow):
     # Dж - коэффициент диффузии в сплаве
     # параметры примеси
@@ -68,7 +67,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         lst = [self.label_2, self.label_6, self.label_7, self.label_16, self.label_10, self.label_20, self.label_19,
                self.label_18, self.label_21, self.label_17, self.label_11, self.label_3, self.label_4, self.label_8,
                self.label_9, self.label_13, self.label_14, self.delta_mean_l, self.k_mean_l, self.ki_mean_l, self.kob_l,
-               self.d_t_l, self.label]  # вносим в список надписи
+               self.d_t_l, self.label, self.label_5, self.label_12, self.label_15, self.label_22]  # вносим в список надписи
         for label in lst:
             label.setFont(font)
         self.substance_type_cb.setFont(font)
@@ -85,7 +84,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return False
 
     def dumb_defence(self):
-        if self.w_t == -1.0 or self.w_kr == -1.0:
+        if self.w_t == 0.0 or self.w_kr == 0.0:
             QMessageBox.warning(self, "Ошибка", "Вы не задали параметры установки, посмотрите \"Изменение "
                                                 "параметров установки\" в разделе \"Моделирование\" на панели "
                                                 "инструментов")
@@ -100,16 +99,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if float(self.f_le.text()) < 0 or float(self.f_le.text()) > 15:
             QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую скорость кристаллизации f (мм/мин)")
             return False
-        if float(self.c0_le.text()) < 1E+10 or float(self.c0_le.text()) > 1E+15:
+        if float(self.c0_le.text()) <= 0 or float(self.c0_le.text()) >= 10:
             QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую начальную концентрацию примеси Co (cм^-3)")
             return False
-        if float(self.ct_le.text()) < 1E+15 or float(self.ct_le.text()) > 1E+17:
+        if float(self.ct_le.text()) <= 0 or float(self.ct_le.text()) >= 10:
             QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую концентрацию примеси в твердом состоянии (Cт)")
             return False
         if float(self.mui_le.text()) < 1E-3 or float(self.mui_le.text()) > 1E-1:
             QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую молярную массу приместого компонента (mu_i)")
             return False
-        if float(self.yi_le.text()) < 0.1E-4 or float(self.yi_le.text()) > 10E-4:
+        if float(self.yi_le.text()) <= 0 or float(self.yi_le.text()) >= 10:
             QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую молярную массу в долях (yi)")
             return False
         return True
@@ -158,10 +157,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.substance_type = self.substance_type_cb.currentIndex()
         self.mu = float(self.mu_le.text())
         self.ro = float(self.ro_le.text())
-        self.c_t = float(self.ct_le.text())
-        self.c_zh = float(self.czh_le.text())
+        self.c_t = float(self.ct_le.text()) * 10 ** float(self.ct_sb.text())
+        self.c_zh = float(self.czh_le.text()) * 10 ** float(self.czh_sb.text())
         self.f = float(self.f_le.text())
-        self.c0 = float(self.c0_le.text())
+        self.c0 = float(self.c0_le.text()) * 10 ** float(self.c0_sb.text())
 
         delta = calculation.diff_layer_thickness(self.substance_type, self.mu, self.ro, self.w_kr, self.w_t)
         k = calculation.impurity_distribution_coef(self.c_t, self.c_zh, self.substance_type, self.f, delta)

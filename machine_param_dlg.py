@@ -14,12 +14,11 @@ class MachineParametersDialog(QDialog, Ui_Dialog):
 
         self.setup_settings_btn.clicked.connect(lambda: self.set_parameters())
 
-    w_t = -1.0
-    w_kr = -1.0
+    w_t = 0.0
+    w_kr = 0.0
 
     def set_parameters(self):
         if self.w_t_le.text() == "" or self.w_kr_le.text() == "":
-            print("void")
             QMessageBox.warning(self, "Ошибка", "Вы не ввели параметры установки")
             self.w_t_le.setText(str(self.w_t))
             self.w_kr_le.setText(str(self.w_kr))
