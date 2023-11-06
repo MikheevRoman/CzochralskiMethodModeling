@@ -1,17 +1,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QInputDialog, QFontDialog, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QMainWindow, QFontDialog, QVBoxLayout
 from mainwindow import Ui_MainWindow
-from graph_viewer import GraphWidget
 from machine_param_dlg import *
 from graph_settings import *
 from anime import playing_animation
 import calculation
-import sys
-import pygame
+
 
 # параметр ti нигде не используется
-
 class MainWindow(QMainWindow, Ui_MainWindow):
     # Dж - коэффициент диффузии в сплаве
     # параметры примеси
@@ -25,8 +21,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     s_kr = 0.0  # задается площадь кристалла
     # alpha = 0.0  # коэффициент испарения из жидкой фазы
     # machine setup
-    w_kr = -1.0  # [0, 100]
-    w_t = -1.0  # [0, 15]
+    w_kr = 0.0  # [0, 100]
+    w_t = 0.0  # [0, 15]
 
     # SYSTEM SETTINGS
     animation_enabled = False
@@ -48,11 +44,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.graph_modality_act.triggered.connect(lambda: self.set_graph_modality())
         self.animation_enable_act.triggered.connect(lambda: self.set_animation())
         self.input_rules_action.triggered.connect(lambda: QMessageBox.about(self, "Правила ввода данных", "Для ввода "
-                                                                                                          "чисел формата a*10^n используйте "
-                                                                                                          "экспоненциальную форму записи числа: "
-                                                                                                          "например, "
-                                                                                                          "число 2.1*10^15 вводите как 2.1E+15, "
-                                                                                                          "число 3.45*10^(-7) - как 3.45E-7"))
+                                                                                                          "не целых чисел"
+                                                                                                          "используйте точку"))
         self.set_text_size_action.triggered.connect(lambda: self.set_text_size())
 
     def set_graph_modality(self):
@@ -113,27 +106,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return False
         return True
 
-    def set_parametrs_from_le(self):
+    def set_parameters_from_le(self):    # автозаполнение параметров
         if self.f_le.text() == "":
             self.f_le.setText(str((0 + 15) / 2))
         if self.c0_le.text() == "":
-            self.c0_le.setText("{:.0e}".format((1E+10 + 1E+15) / 2))
+            self.c0_le.setText(str(5))
         if self.mu_le.text() == "":
             self.mu_le.setText(str(1))
         if self.ro_le.text() == "":
             self.ro_le.setText(str(1))
         if self.ct_le.text() == "":
-            self.ct_le.setText(str((1E+15 + 1E+17) / 2))
+            self.ct_le.setText(str(5.05))
         if self.czh_le.text() == "":
-            self.czh_le.setText(str(1E+17))
+            self.czh_le.setText(str(1))
         if self.d_le.text() == "":
             self.d_le.setText(str(1))
         if self.czh_le.text() == "":
             self.czh_le.setText(str(1))
         if self.mui_le.text() == "":
-            self.mui_le.setText(str((1E-3 + 1E-1) / 2))
+            self.mui_le.setText(str(0.0505))
         if self.yi_le.text() == "":
-            self.yi_le.setText(str((1E-5 + 1E-3) / 2))
+            self.yi_le.setText(str(5.05))
 
     def show_about(self):
         QMessageBox.about(self, "О программе", "Разработана студентами СПбГУТ")
@@ -149,7 +142,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         dlg.exec()
 
     def start_process(self):
-        self.set_parametrs_from_le()
+        self.set_parameters_from_le()
         # защита от дурака
         if not self.dumb_defence():
             return
