@@ -1,220 +1,321 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QInputDialog, QFontDialog, QVBoxLayout, QLabel
-from mainwindow import Ui_MainWindow
-from graph_viewer import GraphWidget
-from machine_param_dlg import *
-from graph_settings import *
-from anime import playing_animation
-import calculation
-import sys
 import pygame
 
 
-# реализовать защиту от дурака и независимость ввода параметров
-# сброс выведенных значений после повторного моделирования
-class MainWindow(QMainWindow, Ui_MainWindow):
-    # Dж - коэффициент диффузии в сплаве
-    # параметры примеси
-    substance_type = 0.0
-    mu = 0.0
-    ro = 0.0
-    c_t = 0.0  # [1E+15, 1E+17]
-    c_zh = 0.0  #
-    f = 0.0  # [0, 15]
-    c0 = 0.0  # [1E+10, 1E+15]
-    s_kr = 0.0  # задается площадь кристалла
-    # alpha = 0.0  # коэффициент испарения из жидкой фазы
-    # machine setup
-    w_kr = -1.0  # [0, 100]
-    w_t = -1.0  # [0, 15]
+def draw_text(screen, text, x, y, font_size, font_color): # надпись
+    font = pygame.font.Font(None, font_size)
+    text_surface = font.render(text, True, font_color)
+    screen.blit(text_surface, (x, y))
 
-    # SYSTEM SETTINGS
-    animation_enabled = False
-    graph_modality = False  # false - widget, true - window
 
-    def __init__(self):
-        super().__init__()
-        self.setupUi(self)
-        self.showMaximized()
-        self.setWindowTitle("Моделирование выращивания кристаллов кремния методом Чохральского")
 
-        self.start_process_btn.clicked.connect(lambda: self.start_process())
-        self.set_fullscreen.triggered.connect(lambda: self.showFullScreen())
-        self.disable_fullscreen.triggered.connect(lambda: self.showMaximized())
-        self.change_machine_setup_action.triggered.connect(lambda: self.change_setup())
-        self.change_graph_setup_action.triggered.connect(lambda: self.change_graph_settings())
-        self.about_action.triggered.connect(lambda: QMessageBox.about(self, "О программе", "Разработана студентами "
-                                                                                           "СПбГУТ"))
-        self.graph_modality_act.triggered.connect(lambda: self.set_graph_modality())
-        self.animation_enable_act.triggered.connect(lambda: self.set_animation())
-        self.input_rules_action.triggered.connect(lambda: QMessageBox.about(self, "Правила ввода данных", "Для ввода "
-                                                                                                          "чисел формата a*10^n используйте "
-                                                                                                          "экспоненциальную форму записи числа: "
-                                                                                                          "например, "
-                                                                                                          "число 2.1*10^15 вводите как 2.1E+15, "
-                                                                                                          "число 3.45*10^(-7) - как 3.45E-7"))
-        self.set_text_size_action.triggered.connect(lambda: self.set_text_size())
+def playing_animation(w_t, w_kr):
+    pygame.init()
+    pygame.display.set_icon(pygame.Surface((1, 1)))
+    pygame.display.set_caption("Графическое представление")
 
-    def set_graph_modality(self):
-        self.graph_modality = not self.graph_modality
+    # берем информацию об экране
+    screen_width = 1000
+    screen_height = 800
 
-    def set_animation(self):
-        self.animation_enabled = not self.animation_enabled
+    screen_w = 1300
+    screen_h = 800
 
-    # настройка шрифта
-    def set_text_size(self):
-        font = QFontDialog.getFont(self)[0]
-        lst = [self.label_2, self.label_6, self.label_7, self.label_16, self.label_10, self.label_20, self.label_19,
-               self.label_18, self.label_21, self.label_17, self.label_11, self.label_3, self.label_4, self.label_8,
-               self.label_9, self.label_13, self.label_14, self.delta_mean_l, self.k_mean_l, self.ki_mean_l, self.kob_l,
-               self.d_t_l, self.label]  # вносим в список надписи
-        for label in lst:
-            label.setFont(font)
-        self.substance_type_cb.setFont(font)
-        self.start_process_btn.setFont(font)
-        self.output_box.setFont(font)
+    screen = pygame.display.set_mode((screen_w, screen_h))
 
-    def float_check(self):  # проверка
-        superMegaString3000 = self.f_le.text() + self.c0_le.text() + self.mu_le.text() + self.ro_le.text() \
-                              + self.ct_le.text() + self.czh_le.text() + self.d_le.text() + self.mui_le.text() \
-                              + self.yi_le.text() + self.s_kr_le.text()
-        for char in superMegaString3000:
-            if not (char == '.' or char == '-' or char == 'E' or char == 'e' or char == '+' or char.isdigit()):
-                return True
-        return False
+    # цвета
+    white = (255, 255, 255)
+    light_grey = (144, 144, 144)
+    grey = (128, 128, 128)
+    silver = (192, 192, 192)
+    orange = (255, 140, 0)
+    light_orange = (255, 79, 0)
 
-    def dumb_defence(self):
-        if self.w_t == -1.0 or self.w_kr == -1.0:
-            QMessageBox.warning(self, "Ошибка", "Вы не задали параметры установки, посмотрите \"Изменение "
-                                                "параметров установки\" в разделе \"Моделирование\" на панели "
-                                                "инструментов")
-            return False
-        if self.substance_type_cb.currentIndex() == 0:
-            QMessageBox.warning(self, "Ошибка", "Вы не выбрали примесь")
-            return False
-        if self.float_check():
-            QMessageBox.warning(self, "Ошибка", "Вы ввели число неправильно, посмотрите \"Правила ввода\""
-                                                "в разделе \"Справка\"")
-            return False
-        if float(self.f_le.text()) < 0 or float(self.f_le.text()) > 15:
-            QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую скорость кристаллизации f (мм/мин)")
-            return False
-        if float(self.c0_le.text()) < 1E+10 or float(self.c0_le.text()) > 1E+15:
-            QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую начальную концентрацию примеси Co (cм^-3)")
-            return False
-        if float(self.ct_le.text()) < 1E+15 or float(self.ct_le.text()) > 1E+17:
-            QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую концентрацию примеси в твердом состоянии (Cт)")
-            return False
-        if float(self.mui_le.text()) < 1E-3 or float(self.mui_le.text()) > 1E-1:
-            QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую молярную массу приместого компонента (mu_i)")
-            return False
-        if float(self.yi_le.text()) < 0.1E-4 or float(self.yi_le.text()) > 10E-4:
-            QMessageBox.warning(self, "Ошибка", "Вы ввели недопустимую молярную массу в долях (yi)")
-            return False
-        return True
+    # спиды
+    palka_speed = 0.8
+    lava_speed = 0.1
 
-    def set_parametrs_from_le(self):
-        if self.f_le.text() == "":
-            self.f_le.setText(str((0 + 15) / 2))
-        if self.c0_le.text() == "":
-            self.c0_le.setText("{:.0e}".format((1E+10 + 1E+15) / 2))
-        if self.mu_le.text() == "":
-            self.mu_le.setText(str(1))
-        if self.ro_le.text() == "":
-            self.ro_le.setText(str(1))
-        if self.ct_le.text() == "":
-            self.ct_le.setText(str((1E+15 + 1E+17) / 2))
-        if self.czh_le.text() == "":
-            self.czh_le.setText(str(1E+17))
-        if self.d_le.text() == "":
-            self.d_le.setText(str(1))
-        if self.czh_le.text() == "":
-            self.czh_le.setText(str(1))
-        if self.mui_le.text() == "":
-            self.mui_le.setText(str((1E-3 + 1E-1) / 2))
-        if self.yi_le.text() == "":
-            self.yi_le.setText(str((1E-5 + 1E-3) / 2))
+    # 1 деталь (малый прямоугольник) корпуса
+    first_frame_x = screen_width / 2 - screen_width / 16 + 100
+    first_frame_y = 0
+    first_frame_width = screen_width / 8
+    first_frame_height = screen_height / 15
+    first_frame_color = grey
 
-    def show_about(self):
-        QMessageBox.about(self, "О программе", "Разработана студентами СПбГУТ")
+    # 2 деталь (верхний эллипс) корпуса
+    second_frame_points = (first_frame_x - first_frame_width * 2,
+                           first_frame_height - 0.01 * screen_height,
+                           first_frame_width * 5,
+                           first_frame_height * 5)
+    second_frame_color = grey
 
-    def change_setup(self):
-        dlg = MachineParametersDialog()
-        dlg.exec()
-        self.w_t = dlg.w_t
-        self.w_kr = dlg.w_kr
+    # 3 деталь (нижний эллипс) корпуса
+    third_frame_points = (first_frame_x - first_frame_width * 2,
+                          screen_height - first_frame_height * 5,
+                          first_frame_width * 5,
+                          first_frame_height * 5)
+    third_frame_color = grey
 
-    def change_graph_settings(self):
-        dlg = GraphSettings()
-        dlg.exec()
+    # 4 деталь (большой прямоугольник) корпуса
+    fourth_frame_x = first_frame_x - first_frame_width * 2
+    fourth_frame_y = (first_frame_height - 0.01 * screen_height) + first_frame_height * 2.5
+    fourth_frame_width = first_frame_width * 5
+    fourth_frame_height = (screen_height - first_frame_height * 5) - (first_frame_height - 0.01 * screen_height)
+    fourth_frame_color = grey
 
-    def start_process(self):
-        self.set_parametrs_from_le()
-        # защита от дурака
-        if not self.dumb_defence():
-            return
+    # 1 деталь (верхний эллипс) полости
+    first_cavity_points = (first_frame_x - first_frame_width * 1.5,
+                           first_frame_height * 2,
+                           first_frame_width * 5 / 1.25,
+                           first_frame_height * 5 / 1.25)
+    first_cavity_color = white
 
-        self.substance_type = self.substance_type_cb.currentIndex()
-        self.mu = float(self.mu_le.text())
-        self.ro = float(self.ro_le.text())
-        self.c_t = float(self.ct_le.text())
-        self.c_zh = float(self.czh_le.text())
-        self.f = float(self.f_le.text())
-        self.c0 = float(self.c0_le.text())
+    # 2 деталь (нижний эллипс) полости (по сути дно стакана)
+    second_cavity_points = (first_frame_x - first_frame_width * 1.5,
+                            screen_height - (first_frame_height + first_frame_height * 5 / 1.25),
+                            first_frame_width * 5 / 1.25,
+                            first_frame_height * 5 / 1.25)
+    second_cavity_color = light_grey
 
-        delta = calculation.diff_layer_thickness(self.substance_type, self.mu, self.ro, self.w_kr, self.w_t)
-        k = calculation.impurity_distribution_coef(self.c_t, self.c_zh, self.substance_type, self.f, delta)
+    # 3 деталь (прямоугольник) полости
+    third_cavity_x = first_frame_x - first_frame_width * 1.5
+    third_cavity_y = first_frame_height * 2 + first_frame_height * 2.5 / 1.25
+    third_cavity_width = first_frame_width * 5 / 1.25
+    third_cavity_height = screen_height - (first_frame_height + first_frame_height * 5 / 1.25) - first_frame_height * 2
+    third_cavity_color = white
 
-        # ui output setup
-        self.delta_mean_l.setText(str(delta.__round__(3)))
-        self.k_mean_l.setText(str(k.__round__(3)))
-        if self.substance_type == 2 or self.substance_type == 4:
-            ki = calculation.k_i(self.substance_type)
-            k_ob = calculation.k_ob(k, ki)
-            self.ki_mean_l.setText(str(ki.__round__(3)))
-            self.kob_l.setText(str(k_ob.__round__(3)))
-            if self.s_kr_le.text() != "":
-                self.s_kr = float(self.s_kr_le.text())
-                D_t = calculation.D_t(self.s_kr, ki, k, self.f)
-                self.d_t_l.setText(str(D_t.__round__(3)))
-            elif self.s_kr_le.text() == "":
-                pass
-            else:
-                QMessageBox.warning(self, "Ошибка", "Для решения обратной задачи должны быть введены все параметры")
-                return
+    # 1 деталь стакана (прямоугольник)
+    first_glass_x = first_frame_x - first_frame_width * 1.5
+    first_glass_y = first_frame_height * 2 + first_frame_height * 2.5 / 1.25 + (
+                screen_height - (first_frame_height + first_frame_height * 5 / 1.25) - first_frame_height * 2) / 2
+    first_glass_width = first_frame_width * 5 / 1.25
+    first_glass_height = (screen_height - (
+                first_frame_height + first_frame_height * 5 / 1.25) - first_frame_height * 2) / 2
+    first_glass_color = silver
+
+    # 2 деталь (нижний эллипс) стакан лава
+    second_glass_points = (first_frame_x - first_frame_width * 1.5,
+                           screen_height - (first_frame_height + first_frame_height * 5.3),
+                           first_frame_width * 5 / 1.25,
+                           first_frame_height * 5 / 1.1)
+    second_glass_color = orange
+
+    # 3 деталь (верхний эллипс) стакан
+    third_glass_points = (first_frame_x - first_frame_width * 1.5,
+                          first_frame_height * 6.1,
+                          first_frame_width * 5 / 1.25,
+                          first_frame_height * 5 / 1.25)
+    third_glass_color = silver
+
+    # 4 деталь (левый прямоугольник) стакан
+    fourth_glass_x = first_frame_x - first_frame_width * 1.5
+    fourth_glass_y = first_frame_height * 7
+    fourth_glass_width = first_frame_height * 5 * 0.15
+    fourth_glass_height = first_frame_height * 5.2
+    fourth_glass_color = light_grey
+
+    # 5 деталь (правый прямоугольник) стакан
+    fifth_glass_x = first_frame_x + first_frame_width * 2.18
+    fifth_glass_y = first_frame_height * 7
+    fifth_glass_width = first_frame_height * 5 * 0.15
+    fifth_glass_height = first_frame_height * 5.2
+    fifth_glass_color = light_grey
+
+    # 6 деталь (прямоугольник) стакан лава
+    sixth_glass_x = first_frame_x - first_frame_width * 1.5
+    sixth_glass_y = first_frame_height * 8
+    sixth_glass_width = first_frame_width * 5 / 1.25
+    sixth_glass_height = first_frame_height * 4
+    sixth_glass_color = orange
+
+    # 7 деталь (верхний эллипс) лава
+    seventh_glass_points = (first_frame_x - first_frame_width * 1.5,
+                            first_frame_height * 7,
+                            first_frame_width * 5 / 1.25,
+                            first_frame_height * 5 / 1.25)
+    seventh_glass_color = orange
+
+    # 1 деталь (белый прямоугольник сверху) палка
+    first_palka_x = screen_width / 2 - first_frame_width / 4 + 100
+    first_palka_y = 0
+    first_palka_width = first_frame_width / 2
+    first_palka_height = first_frame_height * 3
+    first_palka_color = white
+
+    # 2 деталь (тонкая палка) палка
+    second_palka_x = screen_width / 2 - first_frame_width / 16 + 100
+    second_palka_y = 0
+    second_palka_width = first_frame_width / 8
+    second_palka_height = first_frame_height * 8.5
+    second_palka_color = light_grey
+
+    # 3 деталь (треугольник) от палки
+    third_palka_points = [(screen_width / 2 - first_frame_width * 0.006 + 100, first_frame_height * 8.4),
+                          (screen_width / 2 - first_frame_width / 4 + 100, first_frame_height * 8.75),
+                          (screen_width / 2 + first_frame_width / 4 + 100, first_frame_height * 8.75)]  # верх, лево, право
+    third_palka_color = light_orange
+
+    # 4 деталь (толстая палка) лава
+    fourth_palka_x = screen_width / 2 - first_frame_width / 4  + 100
+    fourth_palka_y = first_frame_height * 8.75
+    fourth_palka_width = first_frame_width / 2
+    fourth_palka_height = first_frame_height * 3.25
+    fourth_palka_color = light_orange
+
+    # кнопка начала анимации
+    button_rect = pygame.Rect(10, 10, 240, 40)
+    button_color = (0, 255, 0)
+    button_text = "Начать анимацию"
+    font = pygame.font.Font(None, 36)
+    text_surface = font.render(button_text, True, (0, 0, 0))
+
+    animation_started = False
+
+    # Основной аниме цикл
+    running = True
+    while running:
+
+        # Заливка экрана цветов
+        screen.fill(white)
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if button_rect.collidepoint(event.pos):
+                    if not animation_started:
+                        animation_started = True
+                        second_palka_y = 0
+                        fourth_palka_y = first_frame_height * 8.75
+                        third_palka_points = [(screen_width / 2 - first_frame_width * 0.006 + 100, first_frame_height * 8.4),
+                                              (screen_width / 2 - first_frame_width / 4 + 100, first_frame_height * 8.75),
+                                              (screen_width / 2 + first_frame_width / 4 + 100, first_frame_height * 8.75)]
+                        sixth_glass_y = first_frame_height * 8
+                        sixth_glass_height = first_frame_height * 4
+                        seventh_glass_points = (first_frame_x - first_frame_width * 1.5,
+                                                first_frame_height * 7,
+                                                first_frame_width * 5 / 1.25,
+                                                first_frame_height * 5 / 1.25)
+
+
+        if fourth_palka_y <= first_frame_height * 3:
+            animation_started = False
+
+        if animation_started:
+
+
+
+            second_palka_y -= palka_speed
+            fourth_palka_y -= palka_speed
+
+            third_palka_points = [(x, y - palka_speed) for x, y in third_palka_points]
+
+            if fourth_palka_y + fourth_palka_height >= sixth_glass_y:
+                sixth_glass_y += lava_speed
+                sixth_glass_height -= lava_speed
+
+                x, y, width, height = seventh_glass_points
+                y += lava_speed
+                seventh_glass_points = (x, y, width, height)
         else:
-            self.ki_mean_l.setText("-")
-            self.kob_l.setText("-")
+            # Рисуем кнопку
+            pygame.draw.rect(screen, button_color, button_rect)
+            screen.blit(text_surface, (20, 20))
 
-        if self.s_kr_le.text() == "":
-            self.d_t_l.setText("-")
+        # 1 деталь (малый прямоугольник) корпуса
+        pygame.draw.rect(screen, first_frame_color,
+                         (first_frame_x, first_frame_y, first_frame_width, first_frame_height))
 
-        if self.animation_enabled:
-            playing_animation(self.w_t, self.w_kr)  # проигрывание анимации
+        # 2 деталь (верхний эллипс) корпуса
+        pygame.draw.ellipse(screen, second_frame_color, second_frame_points)
 
-        graph = GraphWidget()
-        graph.data_collection()
-        graph.fill_first_graph(self.substance_type, self.mu, self.ro, self.w_kr)
-        graph.fill_second_graph(k, self.c0)
+        # 3 деталь (нижний эллипс) корпуса
+        pygame.draw.ellipse(screen, third_frame_color, third_frame_points)
 
-        self.stackedWidget.addWidget(QtWidgets.QWidget())   # добавляем пустой виджет в стек-виджет
-        self.stackedWidget.setCurrentIndex(self.stackedWidget.currentIndex() + 1)
-        if self.graph_modality:  # если график в отдельном окне
-            layout = QVBoxLayout()
-            self.stackedWidget.currentWidget().setLayout(layout)
-            graph.exec()
-        else:   # если график в главном окне
-            self.stackedWidget.currentWidget().setLayout(graph.return_graph_layout())
-            graph.close()
+        # 4 деталь (большой прямоугольник) корпуса
+        pygame.draw.rect(screen, third_frame_color,
+                         (fourth_frame_x, fourth_frame_y, fourth_frame_width, fourth_frame_height))
+
+        # 1 деталь (верхний эллипс) корпуса
+        pygame.draw.ellipse(screen, first_cavity_color, first_cavity_points)
+
+        # 3 деталь (прямоугольник) полости
+        pygame.draw.rect(screen, third_cavity_color,
+                         (third_cavity_x, third_cavity_y, third_cavity_width, third_cavity_height))
+
+        # 2 деталь (нижний эллипс) корпуса
+        pygame.draw.ellipse(screen, second_cavity_color, second_cavity_points)
+
+        # 2 деталь (нижний эллипс) стакан
+        pygame.draw.ellipse(screen, second_glass_color, second_glass_points)
+
+        # 1 деталь (прямоугольник сильвер)
+        pygame.draw.rect(screen, first_glass_color,
+                         (first_glass_x, first_glass_y, first_glass_width, first_glass_height))
+
+        # 3 деталь (верхний эллипс) стакан
+        pygame.draw.ellipse(screen, third_glass_color, third_glass_points)
+
+        # 7 деталь (верхний эллипс) лава
+        pygame.draw.ellipse(screen, seventh_glass_color, seventh_glass_points)
+
+        # 1 деталь (прямоугольник) палка
+        pygame.draw.rect(screen, first_palka_color,
+                         (first_palka_x, first_palka_y, first_palka_width, first_palka_height))
+
+        # 3 деталь (треугольник)
+        pygame.draw.polygon(screen, third_palka_color, third_palka_points)
+
+        # 4 деталь (толстая палка) палка
+        pygame.draw.rect(screen, fourth_palka_color,
+                         (fourth_palka_x, fourth_palka_y, fourth_palka_width, fourth_palka_height))
+
+        # 6 деталь (прямоугольник лава)
+        pygame.draw.rect(screen, sixth_glass_color,
+                         (sixth_glass_x, sixth_glass_y, sixth_glass_width, sixth_glass_height))
+
+        # 2 деталь (палка) палка
+        pygame.draw.rect(screen, second_palka_color,
+                         (second_palka_x, second_palka_y, second_palka_width, second_palka_height))
+
+        # 4 деталь (левый прямоугольник) стакан
+        pygame.draw.rect(screen, fourth_glass_color,
+                         (fourth_glass_x, fourth_glass_y, fourth_glass_width, fourth_glass_height))
+
+        # 5 деталь (правый прямоугольник) стакан
+        pygame.draw.rect(screen, fifth_glass_color,
+                         (fifth_glass_x, fifth_glass_y, fifth_glass_width, fifth_glass_height))
+
+        draw_text(screen, f"Скорость вращения тигля: {w_t:.2f}", 800, 20, 30, (0, 0, 0))
+        draw_text(screen, f"Скорость вращения кристалла: {w_kr:.2f}", 800, 50, 30, (0, 0, 0))
 
 
-if __name__ == "__main__":
-    import sys
+        draw_text(screen, "Теплозащита", 950, 150, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 155), (800, 110), 2)
+
+        draw_text(screen, "Затравка", 950, 200, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 205), (second_palka_x+second_palka_width/2, second_palka_y+second_palka_height*0.8), 2)
+
+        draw_text(screen, "Кремниевый монокристалл", 950, 250, 30, (0, 0, 0))
+        # if(fourth_palka_y+fourth_palka_height/2 < sixth_glass_y):
+        pygame.draw.line(screen, (0, 0, 0), (945, 255), (fourth_palka_x+fourth_palka_width/2, fourth_palka_y+fourth_palka_height*0.1), 2)
+
+        draw_text(screen, "Кварцевый тигель", 950, 300, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 305), (770, 385), 2)
+
+        draw_text(screen, "Графитовый электронагреватель", 950, 350, 30, (0, 0, 0))
+        pygame.draw.line(screen, (0, 0, 0), (945, 355), (835, 420), 2)
+
+        # draw_text(screen, "Лава", 950, 400, 30, (0, 0, 0))
+        # pygame.draw.line(screen, (0, 0, 0), (945, 405), (sixth_glass_x+sixth_glass_width/2, sixth_glass_y+sixth_glass_height/2), 2)
 
 
 
-    app = QtWidgets.QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
-    sys.exit(app.exec_())
+
+
+        pygame.time.delay(10)
+
+        # Обновление экрана
+        pygame.display.flip()
+
+    pygame.quit()
